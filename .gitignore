@@ -1,0 +1,11 @@
+.DS_Store
+packer-cache
+packer_cache
+*.box
+build/
+output*/
+~
+.vmdk
+.ovf
+.vagrant/*
+variables.pkr.hcl
