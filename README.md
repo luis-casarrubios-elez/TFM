@@ -3,9 +3,14 @@
 
 This is the GitHub repository for my Master final project. 
 
-**START SCENARIO**
+**SETUP**
 
-To start the scenario, just run the command:
+- VM
+- ONOS
+
+**START/STOP SCENARIO**
+
+To start the scenario, [in the Virtual Machine](https://idefix.dit.upm.es/download/vnx/vnx-vm/VNXLAB2021-v2.ova), just run the command:
 
 `sudo vnx -f TFM-FINAL -t`
 
