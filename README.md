@@ -1,5 +1,6 @@
 # TFM
-***Development of Mechanisms for Application Handover in Edge Computing Environments using Software-Defined Networks*** \n
+## Development of Mechanisms for Application Handover in Edge Computing Environments using Software-Defined Networks
+
 This is the GitHub repository for my Master final project. 
 
 **ARRANCAR:**
