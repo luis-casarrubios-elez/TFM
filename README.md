@@ -6,12 +6,12 @@ This is the GitHub repository for my Master final project.
 **REQUIRED SETUP**
 
 To run this project correctly, please, follow the instructions to install and configure the environment:
-- [VNX lab Virtual Machine](https://idefix.dit.upm.es/download/vnx/vnx-vm/VNXLAB2021-v2.ova)
-- [ONOS Controller](https://idefix.dit.upm.es/download/vnx/vnx-vm/VNXLAB2021-v2.ova)
+- [VNX lab Virtual Machine](https://github.com/luis-casarrubios-elez/TFM/tree/master/environment/VNX)
+- [ONOS Controller](https://github.com/luis-casarrubios-elez/TFM/tree/master/environment/ONOS)
 
 **START/STOP SCENARIO**
 
-To start the scenario, [in the Virtual Machine](https://idefix.dit.upm.es/download/vnx/vnx-vm/VNXLAB2021-v2.ova), just run the command:
+To start the scenario, in the VNX lab Virtual Machine, just run the command:
 
 `sudo vnx -f TFM-FINAL -t`
 
@@ -31,3 +31,6 @@ If you run into any DNS resolution problem, just bring the scenario down with th
 
 `sudo vnx -f TFM-FINAL -P`
 
+**TRY THE APP**
+
+*Aquí tendré que meter cómo instalar dash.js player en la VM, o hacer un pequeño script para que se corra automáticamente...*
