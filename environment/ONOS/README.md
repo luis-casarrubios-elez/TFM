@@ -1,6 +1,7 @@
 INSTALACIÓN ONOS EN MACOS
 -------------------------
 Instalación Bazel (tiene que ser la 3.7.2)
+
 $ `export BAZEL_VERSION=3.7.2`
 
 $ `curl -fLO "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-darwin-x86_64.sh"`
