@@ -15,9 +15,9 @@ For more information regarding VNX tool, access [here](http://web.dit.upm.es/vnx
 
 **DASH.JS REFERENCE PLAYER**
 
-To install the DASH client in the virtual machine, run [the script](http://web.dit.upm.es/vnxwiki/index.php/Main_Page) that I made:
+To install the DASH client in the virtual machine, run [the script](https://github.com/luis-casarrubios-elez/TFM/blob/master/environment/VNX/install-dashjs.sh) that I made:
 
-$`./install-dash.js`
+$`./install-dashjs.sh`
 
 The, access the following URL to check that everything worked:
 
