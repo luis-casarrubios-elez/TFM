@@ -10,7 +10,9 @@ $ `pip install requests`
 I recommend to add your current jdk version to your .bash_profile, to avoid any Maven compilation errors:
 
 $ `vim ~/.bash_profile`  
+
 >export JAVA_HOME=$(/usr/libexec/java_home)  
+
 $ `source ~/.bash_profile`
 
 Since I want to build an application against the current ONOS master, i.e. an unreleased version, I will need to first build ONOS yourself and then publish the resulting artifacts in the Maven repository under ~/.m2/repository by running the following command:
@@ -25,7 +27,7 @@ $ `mvn clean install`
 
 Now, you should check your ONOS version by executing in the Karaf console:
 
-\>summary
+\>`summary`
 
 My ONOS version is 3.0.0, and it is the current ONOS master, so now let's define the correct POM version:
 
