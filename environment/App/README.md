@@ -3,14 +3,14 @@ APP COMPILATION AND INSTALLATION
 
 Disclaimer for MacOS Big Sur users, I had some troubles with Python dependencies, so before the process I had to run:
 
-$ `cd ~`
-$ `python2.7 -m ensurepip --default-pip  # https://stackoverflow.com/questions/18363022/importerror-no-module-named-pip`
+$ `cd ~`  
+$ `python2.7 -m ensurepip --default-pip  # https://stackoverflow.com/questions/18363022/importerror-no-module-named-pip`  
 $ `pip install requests`
 
 I recommend to add your current jdk version to your .bash_profile, to avoid any Maven compilation errors:
 
-$ `vim ~/.bash_profile`
->export JAVA_HOME=$(/usr/libexec/java_home)
+$ `vim ~/.bash_profile`  
+>export JAVA_HOME=$(/usr/libexec/java_home)  
 $ `source ~/.bash_profile`
 
 Since I want to build an application against the current ONOS master, i.e. an unreleased version, I will need to first build ONOS yourself and then publish the resulting artifacts in the Maven repository under ~/.m2/repository by running the following command:
