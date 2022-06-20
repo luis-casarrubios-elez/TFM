@@ -19,6 +19,6 @@ To install the DASH client in the virtual machine, run [the script](https://gith
 
 $`./install-dashjs.sh`
 
-The, access the following URL to check that everything worked:
+Then, access the following URL to check that everything worked:
 
-http://localhost/dash.js-2.9.2/samples/dash-if-reference-player/index.html
+`http://localhost/dash.js-2.9.2/samples/dash-if-reference-player/index.html`
