@@ -76,6 +76,13 @@ import org.onosproject.net.packet.PacketPriority;
 import org.onosproject.net.PortNumber;
 import org.onlab.packet.IpPrefix;
 
+import org.onosproject.net.config.ConfigFactory;
+import org.onosproject.net.config.NetworkConfigEvent;
+import org.onosproject.net.config.NetworkConfigListener;
+import org.onosproject.net.config.NetworkConfigRegistry;
+import static org.onosproject.net.config.basics.SubjectFactories.APP_SUBJECT_FACTORY;
+import com.google.common.collect.ImmutableSet;
+
 /**
  * Skeletal ONOS application component.
  */
@@ -88,13 +95,26 @@ public class AppComponent implements SomeInterface {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
+    private final InternalConfigListener cfgListener = new InternalConfigListener();
+
+    private final Set<ConfigFactory> factories = ImmutableSet.of(
+            new ConfigFactory<ApplicationId, AppConfig>(APP_SUBJECT_FACTORY,
+                                                         AppConfig.class,
+                                                         "app") {
+                @Override
+                public AppConfig createConfig() {
+                    return new AppConfig();
+                }
+            }
+    );
+
     /** Some configurable property. */
     private String someProperty;
 
     private static final int PRIORITY_INT = 128;
 
     @Reference(cardinality = ReferenceCardinality.MANDATORY)
-    protected ComponentConfigService cfgService;
+    protected ComponentConfigService componentConfigService;
 
     @Reference(cardinality = ReferenceCardinality.MANDATORY)
     protected CoreService coreService;
@@ -111,14 +131,38 @@ public class AppComponent implements SomeInterface {
     @Reference(cardinality = ReferenceCardinality.MANDATORY)
     protected HostService hostService;
 
+    @Reference(cardinality = ReferenceCardinality.MANDATORY)
+    protected NetworkConfigRegistry cfgService;
+
     private final PacketProcessor packetProcessor = new TcpPacketProcessor();
     private ApplicationId appId;
 
+    // Set of MAC/IP addresses/prefixes and TCP ports needed
+    // Default values set to zero once started
+    private static MacAddress cacheMac = MacAddress.valueOf("00:00:00:00:00:00");
+    private static MacAddress originMac = MacAddress.valueOf("00:00:00:00:00:00");
+    private static MacAddress r1Mac = MacAddress.valueOf("00:00:00:00:00:00");
+    private static IpAddress clientIp = IpAddress.valueOf("0.0.0.0");
+    private static IpAddress cacheIp = IpAddress.valueOf("0.0.0.0");
+    private static IpAddress originIp = IpAddress.valueOf("0.0.0.0");
+    private static int prefixLen = 0;
+    private static int ats = 0;
+    private static int http = 0;
+
+    private static IpPrefix prefixClient = IpPrefix.valueOf(clientIp, prefixLen);
+    private static IpPrefix prefixCache = IpPrefix.valueOf(cacheIp, prefixLen);
+    private static IpPrefix prefixOrigin = IpPrefix.valueOf(originIp, prefixLen);
+    private static TpPort atsPort = TpPort.tpPort(ats);
+    private static TpPort httpPort = TpPort.tpPort(http);
+
     @Activate
     protected void activate() {
-        cfgService.registerProperties(getClass());
+        componentConfigService.registerProperties(getClass());
         appId = coreService.registerApplication("org.foo.app",
                                                 () -> log.info("Periscope down."));
+        cfgService.addListener(cfgListener);
+        factories.forEach(cfgService::registerConfigFactory);
+        cfgListener.reconfigureNetwork(cfgService.getConfig(appId, AppConfig.class));
         packetService.addProcessor(packetProcessor, PacketPriority.CONTROL.priorityValue());
         requestIntercepts();
         log.info("Started");
@@ -126,7 +170,9 @@ public class AppComponent implements SomeInterface {
 
     @Deactivate
     protected void deactivate() {
-        cfgService.unregisterProperties(getClass(), false);
+        componentConfigService.unregisterProperties(getClass(), false);
+        cfgService.removeListener(cfgListener);
+        factories.forEach(cfgService::unregisterConfigFactory);
         withdrawIntercepts();
         flowRuleService.removeFlowRulesById(appId);
         packetService.removeProcessor(packetProcessor);
@@ -152,18 +198,6 @@ public class AppComponent implements SomeInterface {
      * Here, the app install the rules in the SDN switches to redirect certain traffic to the controller, called when activating
      */
     private void requestIntercepts() {
-        
-        // Set of IP addresses/prefixes and TCP ports needed
-        IpAddress cacheIp = IpAddress.valueOf("10.10.1.3"); // I use the IPs to compute the prefixes
-        IpAddress originIp = IpAddress.valueOf("10.10.2.1");
-        IpAddress clientIp = IpAddress.valueOf("10.10.0.1");
-        
-        IpPrefix prefixOrigin = IpPrefix.valueOf(originIp, 32); // 10.10.2.1/32 (only that address)
-        IpPrefix prefixCache = IpPrefix.valueOf(cacheIp, 32); // 10.10.1.3/32 (only that address)
-        IpPrefix prefixClient = IpPrefix.valueOf(clientIp, 32); // 10.10.0.1/32 (only that address)
-
-        TpPort httpPort = TpPort.tpPort(80);
-        TpPort atsPort = TpPort.tpPort(8080);
 
         // One rule for HTTP requests to origin server on port 80 from the client
         TrafficSelector.Builder selector = DefaultTrafficSelector.builder();
@@ -189,19 +223,7 @@ public class AppComponent implements SomeInterface {
      * Here, the app uninstall the rules from the SDN switches, called when deactivating
      */
     private void withdrawIntercepts() {
-        
-        // Set of IP addresses/prefixes and TCP ports needed
-        TpPort httpPort = TpPort.tpPort(80);
-        TpPort atsPort = TpPort.tpPort(8080);
-        
-        IpAddress cacheIp = IpAddress.valueOf("10.10.1.3"); // I use the IPs to compute the prefixes
-        IpAddress originIp = IpAddress.valueOf("10.10.2.1");
-        IpAddress clientIp = IpAddress.valueOf("10.10.0.1");
-        
-        IpPrefix prefixOrigin = IpPrefix.valueOf(originIp, 32); // 10.10.2.1/32 (only that address)
-        IpPrefix prefixCache = IpPrefix.valueOf(cacheIp, 32); // 10.10.1.3/32 (only that address)
-        IpPrefix prefixClient = IpPrefix.valueOf(clientIp, 32); // 10.10.0.1/32 (only that address)
-        
+
         // Cancel the previously installed rules
         TrafficSelector.Builder selector = DefaultTrafficSelector.builder();
         selector.matchEthType(Ethernet.TYPE_IPV4)
@@ -278,19 +300,6 @@ public class AppComponent implements SomeInterface {
         IPv4 ipPacket = (IPv4) eth.getPayload();
         TCP tcpPacket = (TCP) ipPacket.getPayload();
 
-        // Set of MACs/IPs/Ports needed
-        MacAddress cacheMac = MacAddress.valueOf("02:fd:00:00:02:01");
-        
-        IpAddress cacheIp = IpAddress.valueOf("10.10.1.3");
-        IpAddress originIp = IpAddress.valueOf("10.10.2.1");
-        IpAddress clientIp = IpAddress.valueOf("10.10.0.1");
-        
-        TpPort dstPort = TpPort.tpPort(tcpPacket.getDestinationPort());
-        TpPort atsPort = TpPort.tpPort(8080);
-
-        IpPrefix prefix = IpPrefix.valueOf(originIp, 32); // For VNX intermediate scenario
-        IpPrefix prefixClient = IpPrefix.valueOf(clientIp, 32);
-
         // May throw Null Pointer exception if ONOS ignore the host (pingall at the beginning to avoid it)
         HostId hid = HostId.hostId(cacheMac);
         Host cache = hostService.getHost(hid);
@@ -300,8 +309,8 @@ public class AppComponent implements SomeInterface {
         TrafficSelector selector = DefaultTrafficSelector.builder()
                 .matchEthType(Ethernet.TYPE_IPV4)
                 .matchIPSrc(prefixClient)
-                .matchIPDst(prefix)
-                .matchTcpDst(dstPort)
+                .matchIPDst(prefixOrigin)
+                .matchTcpDst(httpPort)
                 .matchIPProtocol(IPv4.PROTOCOL_TCP)
                 .build();
 
@@ -342,18 +351,6 @@ public class AppComponent implements SomeInterface {
         IPv4 ipPacket = (IPv4) eth.getPayload();
         TCP tcpPacket = (TCP) ipPacket.getPayload();
 
-        // Set of MACs/IPs/Ports needed
-        MacAddress originMac = MacAddress.valueOf("02:fd:00:00:03:01"); // For VNX intermediate scenario
-        MacAddress r1Mac = MacAddress.valueOf("02:fd:00:00:00:02"); // For VNX intermediate scenario
-
-        IpAddress originIp = IpAddress.valueOf("10.10.2.1"); // For VNX intermediate scenario
-        IpAddress cacheIp = IpAddress.valueOf("10.10.1.3"); // For VNX intermediate scenario
-        
-        TpPort srcPort = TpPort.tpPort(tcpPacket.getSourcePort());
-        TpPort httpPort = TpPort.tpPort(80);
-
-        IpPrefix prefix = IpPrefix.valueOf(cacheIp, 32); // For VNX intermediate scenario
-
         // May throw Null Pointer exception if ONOS ignore the host (pingall at the beginning to avoid it)
         HostId hid = HostId.hostId(originMac);
         Host origin = hostService.getHost(hid);
@@ -364,8 +361,8 @@ public class AppComponent implements SomeInterface {
         // "IP packets from the Proxy with TCP source port 8080"
         TrafficSelector selector = DefaultTrafficSelector.builder()
                 .matchEthType(Ethernet.TYPE_IPV4)
-                .matchIPSrc(prefix)
-                .matchTcpSrc(srcPort)
+                .matchIPSrc(prefixCache)
+                .matchTcpSrc(atsPort)
                 .matchIPProtocol(IPv4.PROTOCOL_TCP)
                 .build();
 
@@ -397,4 +394,70 @@ public class AppComponent implements SomeInterface {
                 .setOutput(PortNumber.TABLE); // This sends the context packet to the OpenFlow pipeline again to be correctly treated
         context.send();
     }
+
+    private class InternalConfigListener implements NetworkConfigListener {
+
+        /**
+         * Reconfigures the App according to the configuration parameters passed.
+         *
+         * @param cfg configuration object
+         */
+        private void reconfigureNetwork(AppConfig cfg) {
+            if (cfg == null) {
+                return;
+            }
+            if (cfg.cacheMac() != null) {
+                cacheMac = cfg.cacheMac();
+            }
+            if (cfg.originMac() != null) {
+                originMac = cfg.originMac();
+            }
+            if (cfg.r1Mac() != null) {
+                r1Mac = cfg.r1Mac();
+            }
+            if (cfg.clientIp() != null) {
+                clientIp = cfg.clientIp();
+            }
+            if (cfg.cacheIp() != null) {
+                cacheIp = cfg.cacheIp();
+            }
+            if (cfg.originIp() != null) {
+                originIp = cfg.originIp();
+            }
+            if (cfg.prefixLen() != -1) {
+                prefixLen = cfg.prefixLen();
+            }
+            if (cfg.atsPort() != -1) {
+                ats = cfg.atsPort();
+            }
+            if (cfg.httpPort() != -1) {
+                http = cfg.httpPort();
+            }
+        }
+
+        @Override
+        public void event(NetworkConfigEvent event) {
+
+            if ((event.type() == NetworkConfigEvent.Type.CONFIG_ADDED ||
+                    event.type() == NetworkConfigEvent.Type.CONFIG_UPDATED) &&
+                    event.configClass().equals(AppConfig.class)) {
+
+                withdrawIntercepts();
+                AppConfig cfg = cfgService.getConfig(appId, AppConfig.class);
+                reconfigureNetwork(cfg);
+                updateValues();
+                requestIntercepts();
+                log.info("Reconfigured");
+            }
+        }
+    }
+
+    private void updateValues() {
+        prefixClient = IpPrefix.valueOf(clientIp, prefixLen);
+        prefixCache = IpPrefix.valueOf(cacheIp, prefixLen);
+        prefixOrigin = IpPrefix.valueOf(originIp, prefixLen);
+        atsPort = TpPort.tpPort(ats);
+        httpPort = TpPort.tpPort(http);
+    }
+
 }
