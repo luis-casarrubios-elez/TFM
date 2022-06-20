@@ -20,10 +20,10 @@ $ `git clone https://gerrit.onosproject.org/onos`
 
 $ `cd onos`
 
-$ `cat << EOF >> ~/.bash_profile`
-`export ONOS_ROOT="`pwd`"`
-`source $ONOS_ROOT/tools/dev/bash_profile`
-`EOF`
+$ `cat << EOF >> ~/.bash_profile  
+export ONOS_ROOT="`pwd`"  
+source $ONOS_ROOT/tools/dev/bash_profile  
+EOF`
 
 $ `. ~/.bash_profile`
 
