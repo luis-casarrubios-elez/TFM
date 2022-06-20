@@ -1,6 +1,6 @@
-INSTALACIÓN ONOS EN MACOS
--------------------------
-Instalación Bazel (tiene que ser la 3.7.2)
+ONOS INSTALLATION IN MACOS
+--------------------------
+Bazel intallation (version 3.7.2 recommended)
 
 $ `export BAZEL_VERSION=3.7.2`
 
@@ -14,9 +14,7 @@ $ `export PATH="$PATH:$HOME/bin"`
 
 $ `bazel --version`
 
-Y deberíamos obtener la versión que queremos
-
-Ahora procedemos con la instalación de ONOS
+ONOS installation procedure
 
 $ `git clone https://gerrit.onosproject.org/onos`
 
@@ -33,42 +31,16 @@ $ `cd $ONOS_ROOT`
 
 $ `bazel build onos`
 
-Y listo tras un rato haciendo el build
+After build process, you're set!
 
-
-INSTALACIÓN VM MININET EN MACOS
--------------------------------
-Como no se puede correr de manera nativa nos descargamos la .ovf para VirtualBox. Tras un buen rato prueba error, la que funciona con ONOS sin problema es la de Ubuntu 18.04. No tiene más que meter la máquina descargada y antes de arrancarla poner el adaptador de red en modo Bridged, también he descubierto que es la única manera de que pueda interactuar con la VM por ssh sin problema. Por último, he tenido que ejecutar lo siguiente en la VM porque por algún motivo las claves estaban vacías:
-
-$ `ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key`
-
-$ `ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key`
-
-$ `ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key`
-
-
-PONER EN MARCHA EL ESCENARIO
-----------------------------
-Arrancamos ONOS:
+RUNNING ONOS
+------------
+Running a new ONOS controller instance:
 
 $ `cd ~/onos`
 
-$ `ok [clean] [debug]`
+$ `bazel run onos-local clean debug`
 
-Cuando arranque, desde otra ventana nos conectamos a la consola de karaf:
+Once it has started, from a new terminal window, we access Karaf console with:
 
 $ `onos localhost`
-
-Arrancamos mininet-vm y accedemos a ella por ssh:
-
-$ `VBoxHeadless --startvm "Mininet-VM"`
-
-$ `ssh mininet@192.168.0.32`
-
-CAMBIAR A VAGRANT(?)
-
-Arrancamos escenario de prueba dentro de la vm y conectamos el controlador:
-
-$ `sudo mn --mac --controller=remote,ip=192.168.0.14 (--topo linear,3)`
-
-Y YA TODO DEBE FUNCIONAR COMO EN LA VM QUE TENÍA ANTES, PERO CON UNA RESPUESTA MUCHO MEJOR (DE LA UI SOBRETODO)
