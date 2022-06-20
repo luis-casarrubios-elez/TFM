@@ -8,7 +8,7 @@ This is the GitHub repository for my Master final project.
 To run this project correctly, please, follow the instructions to install and configure the environment:
 - [VNX lab Virtual Machine](https://github.com/luis-casarrubios-elez/TFM/tree/master/environment/VNX)
 - [ONOS Controller](https://github.com/luis-casarrubios-elez/TFM/tree/master/environment/ONOS)
-- [ONOS App](https://github.com/luis-casarrubios-elez/TFM/tree/master/environment/ONOS)
+- [ONOS App](https://github.com/luis-casarrubios-elez/TFM/tree/master/environment/App)
 
 **START/STOP SCENARIO**
 
