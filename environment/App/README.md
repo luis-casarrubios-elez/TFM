@@ -53,3 +53,5 @@ If you modify the app source code, you must re-compile and reinstall it in your 
 $`mvn clean install`
 
 $`onos-app localhost reinstall! target/foo-app-3.0.0-SNAPSHOT.oar`
+
+So now, just copy and paste the source code available [here](https://github.com/luis-casarrubios-elez/TFM/tree/master/app) to your brand new generated ONOS app and you're set!
