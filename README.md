@@ -40,15 +40,15 @@ $`onos localhost`
 
 And there, be sure that Reactive Forwarding app is activated:
 
->`app activate fwd`
+onos>`app activate fwd`
 
 Also, check that the new app is activated too:
 
->`app activate foo.app`
+onos>`app activate foo.app`
 
 Last, logout the Karaf console and load the scenario config to the controller with:
 
->`logout`
+onos>`logout`
 
 $`onos-netcfg localhost ~/onos/foo-app/app-config.json`
 
