@@ -1,6 +1,6 @@
 ONOS INSTALLATION IN MACOS
 --------------------------
-Bazel intallation (version 3.7.2 recommended)
+# Bazel intallation (version 3.7.2 recommended)
 
 $ `export BAZEL_VERSION=3.7.2`
 
@@ -14,16 +14,18 @@ $ `export PATH="$PATH:$HOME/bin"`
 
 $ `bazel --version`
 
-ONOS installation procedure
+# ONOS installation procedure
 
 $ `git clone https://gerrit.onosproject.org/onos`
 
 $ `cd onos`
 
-$ `cat << EOF >> ~/.bash_profile  
-export ONOS_ROOT="`pwd`"  
+Edit '.bash_profile' file adding:
+
+export ONOS_ROOT="\`pwd\`"  
 source $ONOS_ROOT/tools/dev/bash_profile  
-EOF`
+
+Finally, run:
 
 $ `. ~/.bash_profile`
 
