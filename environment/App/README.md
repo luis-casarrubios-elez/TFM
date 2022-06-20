@@ -4,7 +4,7 @@ APP COMPILATION AND INSTALLATION
 Disclaimer for MacOS Big Sur users, I had some troubles with Python dependencies, so before the process I had to run:
 
 $ `cd ~`  
-$ `python2.7 -m ensurepip --default-pip  # https://stackoverflow.com/questions/18363022/importerror-no-module-named-pip`  
+$ `python2.7 -m ensurepip --default-pip`  
 $ `pip install requests`
 
 I recommend to add your current jdk version to your .bash_profile, to avoid any Maven compilation errors:
