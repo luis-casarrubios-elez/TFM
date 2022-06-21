@@ -42,18 +42,14 @@ To test the ONOS app that I coded, access the Karaf console (ONOS CLI):
 
 $`onos localhost`
 
-And there, be sure that Reactive Forwarding app is activated:
+List the activated apps to check that the Handover App is activated (this app activates Reactive Forwarding automatically, so it should be listed too):
 
-\>`app activate fwd`
-
-Also, check that the new app is activated too:
-
-\>`app activate foo.app`
+\>`apps -s -a`
 
 Last, logout the Karaf console and load the scenario config to the controller with:
 
 \>`logout`
 
-$`onos-netcfg localhost ~/onos/foo-app/app-config.json`
+$`onos-netcfg localhost ~/onos/handover-app/handover-config.json`
 
 From this moment on, all the http traffic coming from the clients will be redirected to the Proxy server automatically.
