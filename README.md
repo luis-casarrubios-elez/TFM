@@ -1,6 +1,10 @@
 # TFM
 ## Development of Mechanisms for Application Handover in Edge Computing Environments using Software-Defined Networks
 
+![alt text][img]
+
+[img]: https://github.com/luis-casarrubios-elez/TFM/blob/master/img.png "Poster img"
+
 This is the GitHub repository for my Master final project. 
 
 **REQUIRED SETUP**
