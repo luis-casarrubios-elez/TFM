@@ -5,7 +5,7 @@
 
 [img]: https://github.com/luis-casarrubios-elez/TFM/blob/master/img.png "Poster img"
 
-This is the GitHub repository for my Master final project. 
+This is the GitHub repository for my Master's final project. 
 
 **REQUIRED SETUP**
 
