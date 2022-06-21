@@ -35,23 +35,22 @@ $ `export ONOS_POM_VERSION=3.0.0-SNAPSHOT`
 
 Let's create the Template Application now by running:
 
-$ `onos-create-app app org.foo foo-app 3.0.0-SNAPSHOT org.foo.app`
+$ `onos-create-app app org.tfm handover-app 3.0.0-SNAPSHOT org.tfm.handover`
 
 And this should generate the new project for you, now to build it and load it into ONOS:
 
-$ `cd foo-app`
+$ `cd handover-app`
 
 $ `mvn clean install`
 
 And once the build success message appears, run the command to install the application into the running ONOS instance (or cluster), you can use the onos-app tool, which uses ONOS REST API within, to upload the .oar file generated in the previous step. Note that by using the exclamation mark with the install parameter, the application will be activated immediately after being installed:
 
-
-$ `onos-app localhost install! target/foo-app-3.0.0-SNAPSHOT.oar`
+$ `onos-app localhost install! target/handover-app-3.0.0-SNAPSHOT.oar`
 
 If you modify the app source code, you must re-compile and reinstall it in your controller:
 
 $`mvn clean install`
 
-$`onos-app localhost reinstall! target/foo-app-3.0.0-SNAPSHOT.oar`
+$`onos-app localhost reinstall! target/handover-app-3.0.0-SNAPSHOT.oar`
 
 So now, just copy and paste the source code available [here](https://github.com/luis-casarrubios-elez/TFM/tree/master/app) to your brand new generated ONOS app and you're set!
