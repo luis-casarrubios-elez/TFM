@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.foo;
+package org.tfm.handover;
 
 import org.onlab.packet.IpAddress;
 import org.onlab.packet.MacAddress;
@@ -29,7 +29,7 @@ import static org.onosproject.net.config.Config.FieldPresence.OPTIONAL;
 /**
  * App Config class.
  */
-public class AppConfig extends Config<ApplicationId> {
+public class HandoverConfig extends Config<ApplicationId> {
 
     public static final String CACHE_MAC = "cachemac";
     public static final String ORIGIN_MAC = "originmac";

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.foo;
+package org.tfm.handover;
 
 import org.onosproject.cfg.ComponentConfigService;
 import org.osgi.service.component.ComponentContext;
@@ -45,7 +45,6 @@ import org.onosproject.net.DeviceId;
 import java.nio.ByteBuffer;
 import org.onlab.packet.IPacket;
 import org.onlab.packet.Data;
-import org.foo.*;
 import java.io.*;
 import static org.onlab.packet.PacketUtils.*;
 import org.onlab.packet.BasePacket;
@@ -83,33 +82,22 @@ import org.onosproject.net.config.NetworkConfigRegistry;
 import static org.onosproject.net.config.basics.SubjectFactories.APP_SUBJECT_FACTORY;
 import com.google.common.collect.ImmutableSet;
 
-/**
- * Skeletal ONOS application component.
- */
-@Component(immediate = true,
-        service = {SomeInterface.class},
-        property = {
-                "someProperty=Some Default String Value",
-        })
-public class AppComponent implements SomeInterface {
+public class HandoverManager {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final InternalConfigListener cfgListener = new InternalConfigListener();
 
     private final Set<ConfigFactory> factories = ImmutableSet.of(
-            new ConfigFactory<ApplicationId, AppConfig>(APP_SUBJECT_FACTORY,
-                                                         AppConfig.class,
-                                                         "app") {
+            new ConfigFactory<ApplicationId, HandoverConfig>(APP_SUBJECT_FACTORY,
+                                                             HandoverConfig.class,
+                                                        "app") {
                 @Override
-                public AppConfig createConfig() {
-                    return new AppConfig();
+                public HandoverConfig createConfig() {
+                    return new HandoverConfig();
                 }
             }
     );
-
-    /** Some configurable property. */
-    private String someProperty;
 
     private static final int PRIORITY_INT = 128;
 
@@ -162,7 +150,7 @@ public class AppComponent implements SomeInterface {
                                                 () -> log.info("Periscope down."));
         cfgService.addListener(cfgListener);
         factories.forEach(cfgService::registerConfigFactory);
-        cfgListener.reconfigureNetwork(cfgService.getConfig(appId, AppConfig.class));
+        cfgListener.reconfigureNetwork(cfgService.getConfig(appId, HandoverConfig.class));
         packetService.addProcessor(packetProcessor, PacketPriority.CONTROL.priorityValue());
         requestIntercepts();
         log.info("Started");
@@ -177,20 +165,6 @@ public class AppComponent implements SomeInterface {
         flowRuleService.removeFlowRulesById(appId);
         packetService.removeProcessor(packetProcessor);
         log.info("Stopped");
-    }
-
-    @Modified
-    public void modified(ComponentContext context) {
-        Dictionary<?, ?> properties = context != null ? context.getProperties() : new Properties();
-        if (context != null) {
-            someProperty = get(properties, "someProperty");
-        }
-        log.info("Reconfigured");
-    }
-
-    @Override
-    public void someMethod() {
-        log.info("Invoked");
     }
 
     /**
@@ -402,7 +376,7 @@ public class AppComponent implements SomeInterface {
          *
          * @param cfg configuration object
          */
-        private void reconfigureNetwork(AppConfig cfg) {
+        private void reconfigureNetwork(HandoverConfig cfg) {
             if (cfg == null) {
                 return;
             }
@@ -440,10 +414,10 @@ public class AppComponent implements SomeInterface {
 
             if ((event.type() == NetworkConfigEvent.Type.CONFIG_ADDED ||
                     event.type() == NetworkConfigEvent.Type.CONFIG_UPDATED) &&
-                    event.configClass().equals(AppConfig.class)) {
+                    event.configClass().equals(HandoverConfig.class)) {
 
                 withdrawIntercepts();
-                AppConfig cfg = cfgService.getConfig(appId, AppConfig.class);
+                HandoverConfig cfg = cfgService.getConfig(appId, HandoverConfig.class);
                 reconfigureNetwork(cfg);
                 updateValues();
                 requestIntercepts();
