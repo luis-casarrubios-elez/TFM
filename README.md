@@ -50,6 +50,6 @@ Last, logout the Karaf console and load the scenario config to the controller wi
 
 \>`logout`
 
-$`onos-netcfg localhost ~/onos/handover-app/handover-config.json`
+$`onos-netcfg localhost ~/onos/icn-app/icn-config.json`
 
 From this moment on, all the http traffic coming from the clients will be redirected to the Proxy server automatically.
