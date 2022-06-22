@@ -1,6 +1,6 @@
 {
   "apps": {
-    "org.foo.app" : {
+    "org.tfm.icn" : {
       "app" : {
         "cachemac": "02:fd:00:00:02:01",
         "originmac": "02:fd:00:00:03:01",

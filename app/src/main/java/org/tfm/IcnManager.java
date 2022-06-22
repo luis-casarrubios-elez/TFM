@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.tfm.handover;
+package org.tfm;
 
 import org.onosproject.cfg.ComponentConfigService;
 import org.osgi.service.component.ComponentContext;
@@ -82,22 +82,30 @@ import org.onosproject.net.config.NetworkConfigRegistry;
 import static org.onosproject.net.config.basics.SubjectFactories.APP_SUBJECT_FACTORY;
 import com.google.common.collect.ImmutableSet;
 
-public class HandoverManager {
+/**
+ * Default ONOS application component.
+ */
+@Component(immediate = true, property = {"icnProperty=Default Value"})
+
+public class IcnManager{
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final InternalConfigListener cfgListener = new InternalConfigListener();
 
     private final Set<ConfigFactory> factories = ImmutableSet.of(
-            new ConfigFactory<ApplicationId, HandoverConfig>(APP_SUBJECT_FACTORY,
-                                                             HandoverConfig.class,
-                                                        "app") {
+            new ConfigFactory<ApplicationId, IcnConfig>(APP_SUBJECT_FACTORY,
+                                                        IcnConfig.class,
+                                                         "app") {
                 @Override
-                public HandoverConfig createConfig() {
-                    return new HandoverConfig();
+                public IcnConfig createConfig() {
+                    return new IcnConfig();
                 }
             }
     );
+
+    /** Configurable property. */
+    private String icnProperty;
 
     private static final int PRIORITY_INT = 128;
 
@@ -146,11 +154,11 @@ public class HandoverManager {
     @Activate
     protected void activate() {
         componentConfigService.registerProperties(getClass());
-        appId = coreService.registerApplication("org.foo.app",
+        appId = coreService.registerApplication("org.tfm.icn",
                                                 () -> log.info("Periscope down."));
         cfgService.addListener(cfgListener);
         factories.forEach(cfgService::registerConfigFactory);
-        cfgListener.reconfigureNetwork(cfgService.getConfig(appId, HandoverConfig.class));
+        cfgListener.reconfigureNetwork(cfgService.getConfig(appId, IcnConfig.class));
         packetService.addProcessor(packetProcessor, PacketPriority.CONTROL.priorityValue());
         requestIntercepts();
         log.info("Started");
@@ -166,6 +174,20 @@ public class HandoverManager {
         packetService.removeProcessor(packetProcessor);
         log.info("Stopped");
     }
+
+    @Modified
+    public void modified(ComponentContext context) {
+        Dictionary<?, ?> properties = context != null ? context.getProperties() : new Properties();
+        if (context != null) {
+            icnProperty = get(properties, "icnProperty");
+        }
+        log.info("Reconfigured");
+    }
+
+    /*@Override
+    public void someMethod() {
+        log.info("Invoked");
+    }*/
 
     /**
      * Request packet in via packet service
@@ -376,7 +398,7 @@ public class HandoverManager {
          *
          * @param cfg configuration object
          */
-        private void reconfigureNetwork(HandoverConfig cfg) {
+        private void reconfigureNetwork(IcnConfig cfg) {
             if (cfg == null) {
                 return;
             }
@@ -414,10 +436,10 @@ public class HandoverManager {
 
             if ((event.type() == NetworkConfigEvent.Type.CONFIG_ADDED ||
                     event.type() == NetworkConfigEvent.Type.CONFIG_UPDATED) &&
-                    event.configClass().equals(HandoverConfig.class)) {
+                    event.configClass().equals(IcnConfig.class)) {
 
                 withdrawIntercepts();
-                HandoverConfig cfg = cfgService.getConfig(appId, HandoverConfig.class);
+                IcnConfig cfg = cfgService.getConfig(appId, IcnConfig.class);
                 reconfigureNetwork(cfg);
                 updateValues();
                 requestIntercepts();
@@ -435,3 +457,4 @@ public class HandoverManager {
     }
 
 }
+
