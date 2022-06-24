@@ -53,3 +53,8 @@ Last, logout the Karaf console and load the scenario config to the controller wi
 $`onos-netcfg localhost ~/onos/icn-app/icn-config.json`
 
 From this moment on, all the http traffic coming from the clients will be redirected to the Proxy server automatically.
+
+If you want to deactivate the app, I recommend to execute this command to reset the netconfig to avoid undesired flow rules installed in the SDN switches:
+
+$`onos-netcfg localhost ~/onos/icn-app/icn-reset.json`
+
