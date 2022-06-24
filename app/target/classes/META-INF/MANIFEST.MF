@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1655921702153
+Bnd-LastModified: 1656027483354
 Build-Jdk: 11.0.14
 Built-By: luis
 Bundle-Description: ONOS ICN approach application

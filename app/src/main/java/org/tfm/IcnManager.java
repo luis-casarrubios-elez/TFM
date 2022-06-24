@@ -34,7 +34,6 @@ import org.onosproject.net.packet.PacketContext;
 import org.onosproject.net.packet.OutboundPacket;
 import org.onosproject.net.packet.InboundPacket;
 import org.onosproject.net.packet.DefaultOutboundPacket;
-import org.onosproject.net.packet.PacketPriority;
 import org.onosproject.net.packet.PacketProcessor;
 import org.onosproject.net.packet.PacketService;
 import org.onlab.packet.MacAddress;
@@ -61,7 +60,6 @@ import org.onosproject.core.ApplicationId;
 import org.onosproject.net.flow.TrafficSelector;
 import org.onosproject.net.packet.PacketPriority;
 import org.onlab.packet.TpPort;
-import org.onosproject.net.flow.TrafficTreatment;
 import org.onosproject.net.HostId;
 import org.onosproject.net.flowobjective.FlowObjectiveService;
 import org.onosproject.net.flow.FlowRuleService;
@@ -71,7 +69,6 @@ import org.onosproject.net.flow.FlowRule;
 import org.onosproject.net.flowobjective.DefaultForwardingObjective;
 import org.onosproject.net.host.HostService;
 import org.onosproject.net.flowobjective.ForwardingObjective;
-import org.onosproject.net.packet.PacketPriority;
 import org.onosproject.net.PortNumber;
 import org.onlab.packet.IpPrefix;
 
@@ -135,18 +132,22 @@ public class IcnManager{
 
     // Set of MAC/IP addresses/prefixes and TCP ports needed
     // Default values set to zero once started
-    private static MacAddress cacheMac = MacAddress.valueOf("00:00:00:00:00:00");
+    private static MacAddress cacheMac1 = MacAddress.valueOf("00:00:00:00:00:00");
+    private static MacAddress cacheMac2 = MacAddress.valueOf("00:00:00:00:00:00");
     private static MacAddress originMac = MacAddress.valueOf("00:00:00:00:00:00");
-    private static MacAddress r1Mac = MacAddress.valueOf("00:00:00:00:00:00");
-    private static IpAddress clientIp = IpAddress.valueOf("0.0.0.0");
-    private static IpAddress cacheIp = IpAddress.valueOf("0.0.0.0");
+    private static IpAddress clientIp1 = IpAddress.valueOf("0.0.0.0");
+    private static IpAddress clientIp2 = IpAddress.valueOf("0.0.0.0");
+    private static IpAddress cacheIp1 = IpAddress.valueOf("0.0.0.0");
+    private static IpAddress cacheIp2 = IpAddress.valueOf("0.0.0.0");
     private static IpAddress originIp = IpAddress.valueOf("0.0.0.0");
     private static int prefixLen = 0;
     private static int ats = 0;
     private static int http = 0;
 
-    private static IpPrefix prefixClient = IpPrefix.valueOf(clientIp, prefixLen);
-    private static IpPrefix prefixCache = IpPrefix.valueOf(cacheIp, prefixLen);
+    private static IpPrefix prefixClient1 = IpPrefix.valueOf(clientIp1, prefixLen);
+    private static IpPrefix prefixCache1 = IpPrefix.valueOf(cacheIp1, prefixLen);
+    private static IpPrefix prefixClient2 = IpPrefix.valueOf(clientIp2, prefixLen);
+    private static IpPrefix prefixCache2 = IpPrefix.valueOf(cacheIp2, prefixLen);
     private static IpPrefix prefixOrigin = IpPrefix.valueOf(originIp, prefixLen);
     private static TpPort atsPort = TpPort.tpPort(ats);
     private static TpPort httpPort = TpPort.tpPort(http);
@@ -184,33 +185,45 @@ public class IcnManager{
         log.info("Reconfigured");
     }
 
-    /*@Override
-    public void someMethod() {
-        log.info("Invoked");
-    }*/
-
     /**
      * Request packet in via packet service
      * Here, the app install the rules in the SDN switches to redirect certain traffic to the controller, called when activating
      */
     private void requestIntercepts() {
 
-        // One rule for HTTP requests to origin server on port 80 from the client
-        TrafficSelector.Builder selector = DefaultTrafficSelector.builder();
-        selector.matchEthType(Ethernet.TYPE_IPV4)
-                .matchIPSrc(prefixClient)
+        // One rule for HTTP requests to origin server on port 80 from client1
+        TrafficSelector.Builder selectorReq1 = DefaultTrafficSelector.builder();
+        selectorReq1.matchEthType(Ethernet.TYPE_IPV4)
+                .matchIPSrc(prefixClient1)
                 .matchIPDst(prefixOrigin)
                 .matchTcpDst(httpPort)
                 .matchIPProtocol(IPv4.PROTOCOL_TCP);
-        packetService.requestPackets(selector.build(), PacketPriority.CONTROL, appId);
+        packetService.requestPackets(selectorReq1.build(), PacketPriority.CONTROL, appId);
 
-        // One rule for Proxy responses coming from port 8080 (always to the client, no filter needed)
-        TrafficSelector.Builder selector2 = DefaultTrafficSelector.builder();
-        selector2.matchEthType(Ethernet.TYPE_IPV4)
-                .matchIPSrc(prefixCache)
+        // One rule for Proxy1 responses coming from port 8080 (always to client1, no filter needed)
+        TrafficSelector.Builder selectorRes1 = DefaultTrafficSelector.builder();
+        selectorRes1.matchEthType(Ethernet.TYPE_IPV4)
+                .matchIPSrc(prefixCache1)
                 .matchTcpSrc(atsPort)
                 .matchIPProtocol(IPv4.PROTOCOL_TCP);
-        packetService.requestPackets(selector2.build(), PacketPriority.CONTROL, appId);
+        packetService.requestPackets(selectorRes1.build(), PacketPriority.CONTROL, appId);
+
+        // One rule for HTTP requests to origin server on port 80 from client2
+        TrafficSelector.Builder selectorReq2 = DefaultTrafficSelector.builder();
+        selectorReq2.matchEthType(Ethernet.TYPE_IPV4)
+                .matchIPSrc(prefixClient2)
+                .matchIPDst(prefixOrigin)
+                .matchTcpDst(httpPort)
+                .matchIPProtocol(IPv4.PROTOCOL_TCP);
+        packetService.requestPackets(selectorReq2.build(), PacketPriority.CONTROL, appId);
+
+        // One rule for Proxy2 responses coming from port 8080 (always to client2, no filter needed)
+        TrafficSelector.Builder selectorRes2 = DefaultTrafficSelector.builder();
+        selectorRes2.matchEthType(Ethernet.TYPE_IPV4)
+                .matchIPSrc(prefixCache2)
+                .matchTcpSrc(atsPort)
+                .matchIPProtocol(IPv4.PROTOCOL_TCP);
+        packetService.requestPackets(selectorRes2.build(), PacketPriority.CONTROL, appId);
 
     }
 
@@ -221,20 +234,35 @@ public class IcnManager{
     private void withdrawIntercepts() {
 
         // Cancel the previously installed rules
-        TrafficSelector.Builder selector = DefaultTrafficSelector.builder();
-        selector.matchEthType(Ethernet.TYPE_IPV4)
-                .matchIPSrc(prefixClient)
+        TrafficSelector.Builder selectorReq1 = DefaultTrafficSelector.builder();
+        selectorReq1.matchEthType(Ethernet.TYPE_IPV4)
+                .matchIPSrc(prefixClient1)
                 .matchIPDst(prefixOrigin)
                 .matchTcpDst(httpPort)
                 .matchIPProtocol(IPv4.PROTOCOL_TCP);
-        packetService.cancelPackets(selector.build(), PacketPriority.CONTROL, appId);
+        packetService.cancelPackets(selectorReq1.build(), PacketPriority.CONTROL, appId);
 
-        TrafficSelector.Builder selector2 = DefaultTrafficSelector.builder();
-        selector2.matchEthType(Ethernet.TYPE_IPV4)
-                .matchIPSrc(prefixCache)
+        TrafficSelector.Builder selectorRes1 = DefaultTrafficSelector.builder();
+        selectorRes1.matchEthType(Ethernet.TYPE_IPV4)
+                .matchIPSrc(prefixCache1)
                 .matchTcpSrc(atsPort)
                 .matchIPProtocol(IPv4.PROTOCOL_TCP);
-        packetService.cancelPackets(selector2.build(), PacketPriority.CONTROL, appId);
+        packetService.cancelPackets(selectorRes1.build(), PacketPriority.CONTROL, appId);
+
+        TrafficSelector.Builder selectorReq2 = DefaultTrafficSelector.builder();
+        selectorReq2.matchEthType(Ethernet.TYPE_IPV4)
+                .matchIPSrc(prefixClient2)
+                .matchIPDst(prefixOrigin)
+                .matchTcpDst(httpPort)
+                .matchIPProtocol(IPv4.PROTOCOL_TCP);
+        packetService.cancelPackets(selectorReq2.build(), PacketPriority.CONTROL, appId);
+
+        TrafficSelector.Builder selectorRes2 = DefaultTrafficSelector.builder();
+        selectorRes2.matchEthType(Ethernet.TYPE_IPV4)
+                .matchIPSrc(prefixCache2)
+                .matchTcpSrc(atsPort)
+                .matchIPProtocol(IPv4.PROTOCOL_TCP);
+        packetService.cancelPackets(selectorRes2.build(), PacketPriority.CONTROL, appId);
 
     }
 
@@ -265,7 +293,8 @@ public class IcnManager{
             // 10.10.2.1 == 0xA0A0201 == 168428033
             if (ipPacket.getProtocol() == IPv4.PROTOCOL_TCP
                     && ipPacket.getDestinationAddress() == 168428033
-                    && ipPacket.getSourceAddress() == 168427521){
+                    && (ipPacket.getSourceAddress() == 168427521
+                        || ipPacket.getSourceAddress() == 168428289)){
                 TCP tcpPacket = (TCP) ipPacket.getPayload();
                 return tcpPacket.getDestinationPort() == 80;
             }
@@ -280,7 +309,8 @@ public class IcnManager{
             IPv4 ipPacket = (IPv4) eth.getPayload();
             // 10.10.1.3 == 0xA0A0103 == 168427779
             if (ipPacket.getProtocol() == IPv4.PROTOCOL_TCP
-                    && ipPacket.getSourceAddress() == 168427779){
+                    && (ipPacket.getSourceAddress() == 168427779
+                        || ipPacket.getSourceAddress() == 168427780)){
                 TCP tcpPacket = (TCP) ipPacket.getPayload();
                 return tcpPacket.getSourcePort() == 8080;
             }
@@ -292,19 +322,25 @@ public class IcnManager{
     // Processes the specified TCP HTTP packet to be affected by this rule too
     private void processTcpHttpRequest(PacketContext context, Ethernet eth, ConnectPoint srcPoint) {
 
+        IpPrefix matchSrcIp = prefixClient1;
+        MacAddress actionDstMac = cacheMac1;
+        IpAddress actionDstIp = cacheIp1;
+
         // Parses the Ethernet packet to extract the IP and TCP payloads
         IPv4 ipPacket = (IPv4) eth.getPayload();
         TCP tcpPacket = (TCP) ipPacket.getPayload();
 
-        // May throw Null Pointer exception if ONOS ignore the host (pingall at the beginning to avoid it)
-        HostId hid = HostId.hostId(cacheMac);
-        Host cache = hostService.getHost(hid);
+        if (ipPacket.getSourceAddress() == 168428289){
+            matchSrcIp = prefixClient2;
+            actionDstMac = cacheMac2;
+            actionDstIp = cacheIp2;
+        }
 
         // Defines the match part of the OpenFlow rule to install
         // "IP packets from the client to the Origin server with TCP destination port 80"
         TrafficSelector selector = DefaultTrafficSelector.builder()
                 .matchEthType(Ethernet.TYPE_IPV4)
-                .matchIPSrc(prefixClient)
+                .matchIPSrc(matchSrcIp)
                 .matchIPDst(prefixOrigin)
                 .matchTcpDst(httpPort)
                 .matchIPProtocol(IPv4.PROTOCOL_TCP)
@@ -313,8 +349,8 @@ public class IcnManager{
         // Defines the action part of the OpenFlow rule to install
         // "Change the Ethernet and IP destination addresses and TCP destination port"
         TrafficTreatment treatment = DefaultTrafficTreatment.builder()
-                .setEthDst(cacheMac)
-                .setIpDst(cacheIp)
+                .setEthDst(actionDstMac)
+                .setIpDst(actionDstIp)
                 .setTcpDst(atsPort)
                 // This sends the context packet to the OpenFlow pipeline again to let fwd app to forward it correctly
                 .setOutput(PortNumber.TABLE)
@@ -332,8 +368,8 @@ public class IcnManager{
 
         // The current packet is also treated
         context.treatmentBuilder()
-                .setEthDst(cacheMac)
-                .setIpDst(cacheIp)
+                .setEthDst(actionDstMac)
+                .setIpDst(actionDstIp)
                 .setTcpDst(atsPort)
                 .setOutput(PortNumber.TABLE); // This sends the context packet to the OpenFlow pipeline again to be correctly treated
         context.send();
@@ -343,21 +379,21 @@ public class IcnManager{
     // Processes the specified TCP HTTP packet to be affected by this rule too
     private void processTcpHttpResponse(PacketContext context, Ethernet eth, ConnectPoint srcPoint) {
 
+        IpPrefix matchSrcIp = prefixCache1;
+
         // Parses the Ethernet packet to extract the IP and TCP payloads
         IPv4 ipPacket = (IPv4) eth.getPayload();
         TCP tcpPacket = (TCP) ipPacket.getPayload();
 
-        // May throw Null Pointer exception if ONOS ignore the host (pingall at the beginning to avoid it)
-        HostId hid = HostId.hostId(originMac);
-        Host origin = hostService.getHost(hid);
-        HostId r1id = HostId.hostId(r1Mac);
-        Host r1 = hostService.getHost(r1id);
+        if (ipPacket.getDestinationAddress() == 168428289){
+            matchSrcIp = prefixCache2;
+        }
 
         // Defines the match part of the OpenFlow rule to install
         // "IP packets from the Proxy with TCP source port 8080"
         TrafficSelector selector = DefaultTrafficSelector.builder()
                 .matchEthType(Ethernet.TYPE_IPV4)
-                .matchIPSrc(prefixCache)
+                .matchIPSrc(matchSrcIp)
                 .matchTcpSrc(atsPort)
                 .matchIPProtocol(IPv4.PROTOCOL_TCP)
                 .build();
@@ -402,20 +438,26 @@ public class IcnManager{
             if (cfg == null) {
                 return;
             }
-            if (cfg.cacheMac() != null) {
-                cacheMac = cfg.cacheMac();
+            if (cfg.cacheMac1() != null) {
+                cacheMac1 = cfg.cacheMac1();
+            }
+            if (cfg.cacheMac2() != null) {
+                cacheMac2 = cfg.cacheMac2();
             }
             if (cfg.originMac() != null) {
                 originMac = cfg.originMac();
             }
-            if (cfg.r1Mac() != null) {
-                r1Mac = cfg.r1Mac();
+            if (cfg.clientIp1() != null) {
+                clientIp1 = cfg.clientIp1();
             }
-            if (cfg.clientIp() != null) {
-                clientIp = cfg.clientIp();
+            if (cfg.clientIp2() != null) {
+                clientIp2 = cfg.clientIp2();
             }
-            if (cfg.cacheIp() != null) {
-                cacheIp = cfg.cacheIp();
+            if (cfg.cacheIp1() != null) {
+                cacheIp1 = cfg.cacheIp1();
+            }
+            if (cfg.cacheIp2() != null) {
+                cacheIp2 = cfg.cacheIp2();
             }
             if (cfg.originIp() != null) {
                 originIp = cfg.originIp();
@@ -449,8 +491,10 @@ public class IcnManager{
     }
 
     private void updateValues() {
-        prefixClient = IpPrefix.valueOf(clientIp, prefixLen);
-        prefixCache = IpPrefix.valueOf(cacheIp, prefixLen);
+        prefixClient1 = IpPrefix.valueOf(clientIp1, prefixLen);
+        prefixClient2 = IpPrefix.valueOf(clientIp2, prefixLen);
+        prefixCache1 = IpPrefix.valueOf(cacheIp1, prefixLen);
+        prefixCache2 = IpPrefix.valueOf(cacheIp2, prefixLen);
         prefixOrigin = IpPrefix.valueOf(originIp, prefixLen);
         atsPort = TpPort.tpPort(ats);
         httpPort = TpPort.tpPort(http);

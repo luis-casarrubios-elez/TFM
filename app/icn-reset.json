@@ -1,0 +1,19 @@
+{
+  "apps": {
+    "org.tfm.icn" : {
+      "app" : {
+        "cachemac1": "00:00:00:00:00:00",
+        "cachemac2": "00:00:00:00:00:00",
+        "originmac": "00:00:00:00:00:00",
+        "clientip1": "0.0.0.0",
+        "clientip2": "0.0.0.0",
+        "cacheip1": "0.0.0.0",
+        "cacheip2": "0.0.0.0",
+        "originip": "0.0.0.0",
+        "prefixlen": "0",
+        "atsport": "0",
+        "httpport": "0"
+      }
+    }
+  }
+}

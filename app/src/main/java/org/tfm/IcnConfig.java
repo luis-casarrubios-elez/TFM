@@ -31,34 +31,56 @@ import static org.onosproject.net.config.Config.FieldPresence.OPTIONAL;
  */
 public class IcnConfig extends Config<ApplicationId> {
 
-    public static final String CACHE_MAC = "cachemac";
+    public static final String CACHE_MAC1 = "cachemac1";
+    public static final String CACHE_MAC2 = "cachemac2";
     public static final String ORIGIN_MAC = "originmac";
-    public static final String R1_MAC = "r1mac";
-    public static final String CLIENT_IP = "clientip";
-    public static final String CACHE_IP = "cacheip";
+    public static final String CLIENT_IP1 = "clientip1";
+    public static final String CLIENT_IP2 = "clientip2";
+    public static final String CACHE_IP1 = "cacheip1";
+    public static final String CACHE_IP2 = "cacheip2";
     public static final String ORIGIN_IP = "originip";
     public static final String PREFIX_LEN = "prefixlen";
     public static final String ATS_PORT = "atsport";
     public static final String HTTP_PORT = "httpport";
 
     /**
-     * Returns the cache mac.
+     * Returns the cache 1 mac.
      *
-     * @return cache mac or null if not set
+     * @return cache 1 mac or null if not set
      */
-    public MacAddress cacheMac() {
-        String cacheMac = get(CACHE_MAC, null);
-        return cacheMac != null ? MacAddress.valueOf(cacheMac) : null;
+    public MacAddress cacheMac1() {
+        String cacheMac1 = get(CACHE_MAC1, null);
+        return cacheMac1 != null ? MacAddress.valueOf(cacheMac1) : null;
     }
 
     /**
-     * Sets the cache mac.
+     * Sets the cache 1 mac.
      *
      * @param mac new mac address; null to clear
      * @return self
      */
-    public BasicElementConfig cacheMac(String cacheMac) {
-        return (BasicElementConfig) setOrClear(CACHE_MAC, cacheMac);
+    public BasicElementConfig cacheMac1(String cacheMac1) {
+        return (BasicElementConfig) setOrClear(CACHE_MAC1, cacheMac1);
+    }
+
+    /**
+     * Returns the cache 2 mac.
+     *
+     * @return cache 2 mac or null if not set
+     */
+    public MacAddress cacheMac2() {
+        String cacheMac2 = get(CACHE_MAC2, null);
+        return cacheMac2 != null ? MacAddress.valueOf(cacheMac2) : null;
+    }
+
+    /**
+     * Sets the cache 2 mac.
+     *
+     * @param mac new mac address; null to clear
+     * @return self
+     */
+    public BasicElementConfig cacheMac2(String cacheMac2) {
+        return (BasicElementConfig) setOrClear(CACHE_MAC2, cacheMac2);
     }
 
     /**
@@ -82,63 +104,83 @@ public class IcnConfig extends Config<ApplicationId> {
     }
 
     /**
-     * Returns the r1 mac.
-     *
-     * @return r1 mac or null if not set
-     */
-    public MacAddress r1Mac() {
-        String r1Mac = get(R1_MAC, null);
-        return r1Mac != null ? MacAddress.valueOf(r1Mac) : null;
-    }
-
-    /**
-     * Sets the r1 mac.
-     *
-     * @param mac new mac address; null to clear
-     * @return self
-     */
-    public BasicElementConfig r1Mac(String r1Mac) {
-        return (BasicElementConfig) setOrClear(R1_MAC, r1Mac);
-    }
-
-    /**
-     * Returns the client ip.
+     * Returns the client 1 ip.
      *
      * @return ip address or null if not set
      */
-    public IpAddress clientIp() {
-        String clientIp = get(CLIENT_IP, null);
-        return clientIp != null ? IpAddress.valueOf(clientIp) : null;
+    public IpAddress clientIp1() {
+        String clientIp1 = get(CLIENT_IP1, null);
+        return clientIp1 != null ? IpAddress.valueOf(clientIp1) : null;
     }
 
     /**
-     * Sets the client ip.
+     * Sets the client 1 ip.
      *
      * @param ip new ip address; null to clear
      * @return self
      */
-    public BasicElementConfig clientIp(String clientIp) {
-        return (BasicElementConfig) setOrClear(CLIENT_IP, clientIp);
+    public BasicElementConfig clientIp1(String clientIp1) {
+        return (BasicElementConfig) setOrClear(CLIENT_IP1, clientIp1);
     }
 
     /**
-     * Returns the cache server ip.
+     * Returns the client 2 ip.
      *
      * @return ip address or null if not set
      */
-    public IpAddress cacheIp() {
-        String cacheIp = get(CACHE_IP, null);
-        return cacheIp != null ? IpAddress.valueOf(cacheIp) : null;
+    public IpAddress clientIp2() {
+        String clientIp2 = get(CLIENT_IP2, null);
+        return clientIp2 != null ? IpAddress.valueOf(clientIp2) : null;
     }
 
     /**
-     * Sets the cache server ip.
+     * Sets the client 2 ip.
      *
      * @param ip new ip address; null to clear
      * @return self
      */
-    public BasicElementConfig cacheIp(String cacheIp) {
-        return (BasicElementConfig) setOrClear(CACHE_IP, cacheIp);
+    public BasicElementConfig clientIp2(String clientIp2) {
+        return (BasicElementConfig) setOrClear(CLIENT_IP2, clientIp2);
+    }
+
+    /**
+     * Returns the cache 1 server ip.
+     *
+     * @return ip address or null if not set
+     */
+    public IpAddress cacheIp1() {
+        String cacheIp1 = get(CACHE_IP1, null);
+        return cacheIp1 != null ? IpAddress.valueOf(cacheIp1) : null;
+    }
+
+    /**
+     * Sets the cache 1 server ip.
+     *
+     * @param ip new ip address; null to clear
+     * @return self
+     */
+    public BasicElementConfig cacheIp1(String cacheIp1) {
+        return (BasicElementConfig) setOrClear(CACHE_IP1, cacheIp1);
+    }
+
+    /**
+     * Returns the cache 2 server ip.
+     *
+     * @return ip address or null if not set
+     */
+    public IpAddress cacheIp2() {
+        String cacheIp2 = get(CACHE_IP2, null);
+        return cacheIp2 != null ? IpAddress.valueOf(cacheIp2) : null;
+    }
+
+    /**
+     * Sets the cache 2 server ip.
+     *
+     * @param ip new ip address; null to clear
+     * @return self
+     */
+    public BasicElementConfig cacheIp2(String cacheIp2) {
+        return (BasicElementConfig) setOrClear(CACHE_IP2, cacheIp2);
     }
 
     /**
